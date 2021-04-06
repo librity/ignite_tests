@@ -1,14 +1,13 @@
 import request from 'supertest'
-import { Connection } from 'typeorm'
-
-import createConnection from '../../../../database'
+import { Connection, createConnection } from 'typeorm'
 import { app } from '../../../../app'
 
 let connection: Connection
 
-describe('Create User ', () => {
+describe('Create User Controller', () => {
   beforeAll(async () => {
     connection = await createConnection()
+
     await connection.runMigrations()
   })
 
@@ -17,33 +16,23 @@ describe('Create User ', () => {
     await connection.close()
   })
 
-  it('should be able to create user', async () => {
+  it('should be able to create a new user', async () => {
     const response = await request(app).post('/api/v1/users').send({
-      name: 'NormalUser',
-      email: 'normaluser@email.com',
-      password: 'normalpassword',
+      name: 'Nelson Oak',
+      email: 'nelson@nelsonoak.dev',
+      password: 'nelsonDevJs',
     })
 
     expect(response.status).toBe(201)
-    expect(response.body).toHaveProperty('id')
-    expect(response.body.name).toEqual('NormalUser')
-    expect(response.body.email).toEqual('normaluser@email.com')
   })
 
-  it('should not be able to create user with same email', async () => {
-    await request(app).post('/api/v1/users').send({
-      name: 'NormalUser',
-      email: 'normaluser@email.com',
-      password: 'normalpassword',
-    })
-
+  it('should not be able to create a user with the email from another', async () => {
     const response = await request(app).post('/api/v1/users').send({
-      name: 'NormalUser',
-      email: 'normaluser@email.com',
-      password: 'normalpassword',
+      name: 'Nelson Oak',
+      email: 'nelson@nelsonoak.dev',
+      password: 'nelsonDevJs',
     })
 
-    expect(response.status).toBe(400)
     expect(response.body.message).toEqual('User already exists')
   })
 })
